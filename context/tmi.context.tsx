@@ -73,7 +73,7 @@ const initTmiAndListen = async () => {
     await client.connect();
 
     // Detect message events
-    client.on('message', (channel, userstate: Userstate, message, self) => {
+    client.on('message', (channel, userstate, message, self) => {
         // if (self) {
         //     return;
         // }

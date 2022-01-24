@@ -6,10 +6,14 @@ const MessageQueue = styled.div<MessageQueueProps>`
   display: flex;
   flex-direction: column;
   position: fixed;
-  left: 0;
-  bottom: 140px;
+  right: 0;
+  bottom: 300px;
   width: 400px;
   z-index: 2;
+  background-color: #ffffffc0;
+  margin: 0 20px;
+  padding: 20px;
+ 
 `;
 
 export { MessageQueue };
