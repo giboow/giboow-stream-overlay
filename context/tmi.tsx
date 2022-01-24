@@ -1,6 +1,7 @@
-import {Component, Context, createContext, useContext, useEffect, useState} from "react";
-import {tmiClient} from "../lib/tmi";
+import {Context, createContext, useContext, useEffect, useState} from "react";
+import {tmiClient} from "../lib/Twitch/tmi";
 import {Client} from "tmi.js";
+import {Observable, Subject} from "rxjs";
 
 interface TmiContextStruct {
     /**
@@ -12,23 +13,136 @@ interface TmiContextStruct {
      * Tmi client connected state
      */
     connected: boolean;
+
+    /**
+     * Message observable
+     */
+    messageObservable: Observable<any>;
+
+    /**
+     * Sunscription observable
+     */
+    subscriptionObservable: Observable<any>;
+
+    /**
+     * Bits observable
+     */
+    bitsObservable: Observable<any>;
+
+    /**
+     * Subscription observable
+     */
+    raidObservable: Observable<any>;
 }
 
-const TmiContext: Context<TmiContextStruct> = createContext({client: null, connected: false});
 
+
+// Message Subject/Observable
+const messageSubject = new Subject();
+const messageObservable = messageSubject.asObservable();
+
+// Subscription Subject/Observable
+const subscriptionSubject = new Subject();
+const subscriptionObservable = subscriptionSubject.asObservable();
+
+// Bits Subject/Observable
+const bitsSubject = new Subject();
+const bitsObservable = bitsSubject.asObservable();
+
+// Raided Subject/Observable
+const raidSubject = new Subject();
+const raidObservable = raidSubject.asObservable();
+
+
+// Default context Value
+const contextDefaultValue = {
+    client: null, connected: false,
+    messageObservable, subscriptionObservable, bitsObservable, raidObservable
+}
+
+// Init context
+const TmiContext: Context<TmiContextStruct> = createContext(contextDefaultValue);
+
+
+
+/**
+ * Init tmi client
+ */
+const initTmiAndListen = async () => {
+    // Init tmi client
+    const client = tmiClient();
+    await client.connect();
+
+    // Detect message events
+    client.on('message', (channel, userstate, message, self) => {
+        if (self) {
+            return;
+        }
+
+        // Resend original message
+        messageSubject.next({
+            channel,
+            userstate,
+            message
+        });
+    });
+
+    // Detect Raid events
+    client.on("raided", (channel, userstate, message) => {
+        raidSubject.next({
+            channel, userstate, message
+        });
+    });
+
+
+    // Detect Cheer events
+    client.on("cheer", (channel, userstate, message) => {
+        bitsSubject.next({
+            channel, userstate, message
+        });
+    });
+
+    return {
+        ...contextDefaultValue,
+        client,
+        connected: false,
+    };
+};
+
+// Stop tmi
+function stopTmi() : Promise<void> {
+
+    messageSubject.complete();
+    subscriptionSubject.complete();
+    bitsSubject.complete();
+    raidSubject.complete();
+    return;
+}
+
+/**
+ * Tmi context provider
+ *
+ * @param children
+ * @constructor
+ */
 export const TmiProvider = ({children}) => {
 
-    const [tmiStruct, setTmiStuct] = useState({client: null, connected: false});
+    const [tmiStruct, setTmiStuct] = useState({...contextDefaultValue});
 
-    const getConnectedClient = async () => {
-        setTmiStuct({client: await tmiClient().connect(), connected: true});
-    };
     useEffect(() => {
-        getConnectedClient()
+        (async () =>  {
+            setTmiStuct(await initTmiAndListen ());
+        })();
+
+        return () => {stopTmi()}
     }, []);
+
     return <TmiContext.Provider value={tmiStruct}>{children}</TmiContext.Provider>;
 }
 
+/**
+ * Use tmi context
+ */
 export function useTmiContext() {
     return useContext(TmiContext);
 }

@@ -1,18 +1,34 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-import Tmi from "../lib/tmi";
 import {useTmiContext} from "../context/tmi";
-import {Client} from "tmi.js";
+import {useEffect} from "react";
 
+
+let messageObs = null;
+let bitsObs = null;
 export default function Home() {
+    const {messageObservable, bitsObservable, client} = useTmiContext();
+    useEffect(() => {
+        console.log("subscribing to messages");
+        messageObs = messageObservable.subscribe(message => {
+            console.log("New message " , message);
+        });
 
-    const {client, connected} = useTmiContext();
-    console.log(client, connected);
+        bitsObs = bitsObservable.subscribe(message => {
+            console.log("New bits ", message);
+        });
+
+        return () => {
+            messageObs?.unsubscribe();
+            bitsObs?.unsubscribe();
+        }
+    }, [])
+
+    function click() {
+        return client.say(process.env.TMI_CHANNEL, 'bits --bitscount 999999 Woohoo!');
+    }
 
     return (
         <>
-            <div>Hello</div>
+            <button onClick={click}>Hello</button>
         </>
     )
 }
