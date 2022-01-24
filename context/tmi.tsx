@@ -1,6 +1,6 @@
 import {Context, createContext, useContext, useEffect, useState} from "react";
 import {tmiClient} from "../lib/Twitch/tmi";
-import {Client} from "tmi.js";
+import {Client, Userstate} from "tmi.js";
 import {Observable, Subject} from "rxjs";
 
 interface TmiContextStruct {
@@ -36,7 +36,6 @@ interface TmiContextStruct {
 }
 
 
-
 // Message Subject/Observable
 const messageSubject = new Subject();
 const messageObservable = messageSubject.asObservable();
@@ -57,12 +56,12 @@ const raidObservable = raidSubject.asObservable();
 // Default context Value
 const contextDefaultValue = {
     client: null, connected: false,
+    messageSubject,
     messageObservable, subscriptionObservable, bitsObservable, raidObservable
 }
 
 // Init context
 const TmiContext: Context<TmiContextStruct> = createContext(contextDefaultValue);
-
 
 
 /**
@@ -74,16 +73,27 @@ const initTmiAndListen = async () => {
     await client.connect();
 
     // Detect message events
-    client.on('message', (channel, userstate, message, self) => {
-        if (self) {
-            return;
-        }
+    client.on('message', (channel, userstate: Userstate, message, self) => {
+        // if (self) {
+        //     return;
+        // }
 
+        console.log(message);
         // Resend original message
         messageSubject.next({
             channel,
             userstate,
             message
+        });
+    });
+
+    client.on("subscription", (channel, username, method, message, userstate) => {
+        subscriptionSubject.next({
+            channel,
+            username,
+            method,
+            message,
+            userstate
         });
     });
 
@@ -96,9 +106,10 @@ const initTmiAndListen = async () => {
 
 
     // Detect Cheer events
-    client.on("cheer", (channel, userstate, message) => {
+    client.on("cheer", (channel, userstate: Userstate, message) => {
+        console.log(message);
         bitsSubject.next({
-            channel, userstate, message
+           userstate
         });
     });
 
@@ -110,8 +121,7 @@ const initTmiAndListen = async () => {
 };
 
 // Stop tmi
-function stopTmi() : Promise<void> {
-
+function stopTmi(): Promise<void> {
     messageSubject.complete();
     subscriptionSubject.complete();
     bitsSubject.complete();
@@ -130,11 +140,13 @@ export const TmiProvider = ({children}) => {
     const [tmiStruct, setTmiStuct] = useState({...contextDefaultValue});
 
     useEffect(() => {
-        (async () =>  {
-            setTmiStuct(await initTmiAndListen ());
+        (async () => {
+            setTmiStuct(await initTmiAndListen());
         })();
 
-        return () => {stopTmi()}
+        return () => {
+            stopTmi()
+        }
     }, []);
 
     return <TmiContext.Provider value={tmiStruct}>{children}</TmiContext.Provider>;
