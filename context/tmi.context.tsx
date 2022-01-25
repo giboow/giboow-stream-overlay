@@ -20,6 +20,11 @@ interface TmiContextStruct {
     messageObservable: Observable<any>;
 
     /**
+     * Chat observable
+     */
+    chatObservable: Observable<any>;
+
+    /**
      * Sunscription observable
      */
     subscriptionObservable: Observable<any>;
@@ -40,6 +45,11 @@ interface TmiContextStruct {
 const messageSubject = new Subject();
 const messageObservable = messageSubject.asObservable();
 
+// EmoteOnly Subject/Observable
+const chatSubject = new Subject();
+const chatObservable = chatSubject.asObservable();
+
+
 // Subscription Subject/Observable
 const subscriptionSubject = new Subject();
 const subscriptionObservable = subscriptionSubject.asObservable();
@@ -52,12 +62,11 @@ const bitsObservable = bitsSubject.asObservable();
 const raidSubject = new Subject();
 const raidObservable = raidSubject.asObservable();
 
-
 // Default context Value
 const contextDefaultValue = {
     client: null, connected: false,
     messageSubject,
-    messageObservable, subscriptionObservable, bitsObservable, raidObservable
+    messageObservable, chatObservable, subscriptionObservable, bitsObservable, raidObservable
 }
 
 // Init context
@@ -81,6 +90,20 @@ const initTmiAndListen = async () => {
         console.log(message);
         // Resend original message
         messageSubject.next({
+            channel,
+            userstate,
+            message
+        });
+    });
+
+    client.on('chat', (channel, userstate, message, self) => {
+        // if (self) {
+        //     return;
+        // }
+
+        console.log(message);
+        // Resend original message
+        chatSubject.next({
             channel,
             userstate,
             message

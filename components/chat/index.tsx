@@ -7,12 +7,12 @@ import Message from "./message";
 let messageSubscription = null;
 
 export default function Index() {
-    const {messageObservable, client} = useTmiContext();
+    const {chatObservable} = useTmiContext();
 
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        messageSubscription = messageObservable.subscribe(message => {
+        messageSubscription = chatObservable.subscribe(message => {
             setMessages(oldMessages => {
                 return [...oldMessages, message];
             });

@@ -1,22 +1,23 @@
-import {ChatMessage, ChatUser} from "./index.style";
+import {ChatMessage, ChatUser, ChatMessageContent} from "./index.style";
 
 
 let defaultColors = [
         '#FF0000', '#0000FF', '#008000', '#B22222', '#FF7F50',
-        '#9ACD32', '#FF4500', '#2E8B57', '#DAA520', '#D2691E',
+        '#9ACD32', '#FF4500', '#2E8B57', '#d28f2b', '#D2691E',
         '#5F9EA0', '#1E90FF', '#FF69B4', '#8A2BE2', '#00FF7F'
     ],
     randomColorsChosen = {};
 
 function resolveColor(name, color) {
-    if (color !== null) {
-        return color;
-    }
+    // if (color !== null) {
+    //     return color;
+    // }
 
     if (name in randomColorsChosen) {
         color = randomColorsChosen[name];
     } else {
-        color = defaultColors[Math.floor(Math.random() * defaultColors.length)];
+        color = defaultColors[Math.floor(Math.random() * (defaultColors.length -1))];
+        console.log(Math.floor(Math.random() * (defaultColors.length -1)))
         randomColorsChosen[name] = color;
     }
     return color;
@@ -32,7 +33,9 @@ export default function Message({message}) {
         <>
             <ChatMessage>
                 <ChatUser
-                    color={resolveColor(userstate.username, userstate.color)}>{userstate['display-name']}</ChatUser> : {msg}
+                    color={resolveColor(userstate.username, userstate.color)}>{userstate['display-name']}
+                </ChatUser>
+                <ChatMessageContent>{msg}</ChatMessageContent>
             </ChatMessage>
         </>
     )

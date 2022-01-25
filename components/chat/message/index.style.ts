@@ -27,6 +27,9 @@ const ChatMessage = styled.div<ChatMessageProps>`
   animation: ${slideInLeft} 0.3s ease forwards, ${slideOutLeft} 0.5s ease 30000ms forwards;
   display: flex;
   flex-direction: row;
+  background-color: #f5f5f5d0;
+  padding: 8px 16px;
+  margin-bottom: 8px;
 `;
 
 interface ChatMessageUserProps {
@@ -37,15 +40,22 @@ const ChatUser = styled.div<ChatMessageUserProps>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  background-color: #f5f5f5;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.8rem;
+  height: 1rem;
+  margin: 0 1.5rem 0 0;
+  padding: 1rem;
+  font-size: 1rem;
   font-weight: bold;
+  border-radius: 3px;
+  background-color: #FFFFFF;
   color: ${props => props.color};
   
  `;
 
-export {ChatMessage, ChatUser};
+const ChatMessageContent = styled.div`
+  display: flex;
+  flex-direction: row`;
+
+
+export {ChatMessage, ChatUser, ChatMessageContent};
+
+
