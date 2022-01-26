@@ -11,6 +11,6 @@ export const tmiClient = () => {
             username: process.env.TMI_USERNAME,
             password: process.env.TMI_TOKEN
         },
-        channels: [process.env.TMI_CHANNEL,'#ponce']
+        channels: [process.env.TMI_CHANNEL]
     });
 }
