@@ -10,8 +10,9 @@ body {
 
   margin: 0;
   box-sizing: border-box;
-  background: url(/backgrounds/markus-spiske-iar-afB0QQw-unsplash.jpg);
-  background-size: cover;
+  /*background: url(/backgrounds/markus-spiske-iar-afB0QQw-unsplash.jpg);*/
+  background-color: transparent;
+  /*background-size: cover;*/
 }
 
 a {
