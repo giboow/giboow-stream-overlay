@@ -23,7 +23,6 @@ export function tmiClient(): Client {
         },
         channels: [process.env.TMI_CHANNEL]
     });
-console.log(client);
 
     return client;
 }
