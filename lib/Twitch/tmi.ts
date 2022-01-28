@@ -7,8 +7,7 @@ export function tmiClient(): Client {
         secure: true,
     };
 
-    console.log(process.env.TMI_IS_SERVERTEST);
-    if (process.env.TMI_IS_SERVERTEST) {
+    if (process.env.TMI_IS_SERVERTEST === "true") {
         connection = {
             ...connection,
             server: 'irc.fdgt.dev'
