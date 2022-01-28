@@ -9,9 +9,9 @@ let defaultColors = [
     randomColorsChosen = {};
 
 function resolveColor(name, color) {
-    // if (color !== null) {
-    //     return color;
-    // }
+    if (color !== null) {
+        return color;
+    }
 
     if (name in randomColorsChosen) {
         color = randomColorsChosen[name];
@@ -33,7 +33,8 @@ export default function Message({message}) {
         <>
             <ChatMessage>
                 <ChatUser
-                    color={resolveColor(userstate.username, userstate.color)}>{userstate['display-name']}
+                    color={resolveColor(userstate.username, userstate.color)}>
+                    {userstate['display-name']}
                 </ChatUser>
                 <ChatMessageContent>{msg}</ChatMessageContent>
             </ChatMessage>

@@ -1,10 +1,10 @@
-import Index from "../components/chat";
+import Chat from "../components/chat/chat";
 
 export default function Home() {
 
     return (
         <>
-            <Index />
+            <Chat />
         </>
     )
 }

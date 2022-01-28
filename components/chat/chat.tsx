@@ -6,7 +6,7 @@ import Message from "./message";
 
 let messageSubscription = null;
 
-export default function Index() {
+export default function Chat() {
     const {chatObservable} = useTmiContext();
 
     const [messages, setMessages] = useState([]);
