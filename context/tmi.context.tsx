@@ -1,7 +1,10 @@
 import {Context, createContext, useContext, useEffect, useState} from "react";
 import {tmiClient} from "../lib/Twitch/tmi";
-import {Client, Userstate} from "tmi.js";
+import {Client} from "tmi.js";
 import {Observable, Subject} from "rxjs";
+import "reflect-metadata";
+import {TmiUserState} from "../lib/Twitch/models/user-state";
+
 
 interface TmiContextStruct {
     /**
@@ -82,30 +85,24 @@ const initTmiAndListen = async () => {
     await client.connect();
 
     // Detect message events
-    client.on('message', (channel, userstate, message, self) => {
-        // if (self) {
-        //     return;
-        // }
+    client.on('message', (channel, userstate: any, message, self) => {
+        if (self) {
+            return;
+        }
 
-        console.log(message);
         // Resend original message
         messageSubject.next({
             channel,
-            userstate,
+            userstate: TmiUserState.fromObject(userstate),
             message
         });
     });
 
     client.on('chat', (channel, userstate, message, self) => {
-        // if (self) {
-        //     return;
-        // }
-
-        console.log(message);
         // Resend original message
         chatSubject.next({
             channel,
-            userstate,
+            userstate: TmiUserState.fromObject(userstate),
             message
         });
     });
@@ -116,23 +113,23 @@ const initTmiAndListen = async () => {
             username,
             method,
             message,
-            userstate
+            userstate: TmiUserState.fromObject(userstate),
         });
     });
 
     // Detect Raid events
     client.on("raided", (channel, userstate, message) => {
         raidSubject.next({
-            channel, userstate, message
+            channel, userstate: TmiUserState.fromObject(userstate), message
         });
     });
 
 
     // Detect Cheer events
-    client.on("cheer", (channel, userstate: Userstate, message) => {
+    client.on("cheer", (channel, userstate: Object, message) => {
         console.log(message);
         bitsSubject.next({
-           userstate
+            userstate: TmiUserState.fromObject(userstate),
         });
     });
 

@@ -1,4 +1,4 @@
-import {useTmiContext} from "../../context/tmi.context";
+import {useTmiContext} from "../../../context/tmi.context";
 import {useEffect, useState} from "react";
 import {MessageQueue} from "./index.style";
 import Message from "./message";
